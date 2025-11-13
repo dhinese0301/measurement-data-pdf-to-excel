@@ -1,0 +1,12 @@
+streamlit
+camelot-py[cv]
+pandas
+numpy
+opencv-python-headless
+pdfminer.six
+PyPDF2
+python-dotenv
+langchain
+langchain-groq
+xlsxwriter
+ghostscript
