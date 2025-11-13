@@ -5,8 +5,8 @@ numpy
 python-dotenv
 PyPDF2
 pdfminer.six
-opencv-python-headless
-ghostscript
+opencv-python-headless==4.10.0.84
+ghostscript==0.7
 xlsxwriter
 
 # === Camelot for table extraction ===
