@@ -12,11 +12,11 @@ xlsxwriter
 # Camelot for table extraction
 camelot-py[cv]==0.11.0
 
-# LangChain compatible versions
+# LangChain (compatible versions)
 langchain==0.0.353
-langchain-core==0.1.4
+langchain-core==0.1.41
 langchain-groq==0.1.1
 langchain-community==0.0.19
 
-# Other dependencies
+# Tokenizer
 tiktoken
