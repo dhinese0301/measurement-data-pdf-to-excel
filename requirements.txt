@@ -6,7 +6,7 @@ opencv-python-headless
 pdfminer.six
 PyPDF2
 python-dotenv
-langchain
-langchain-groq
+langchain==0.3.7
+langchain-groq==0.1.1
 xlsxwriter
 ghostscript
