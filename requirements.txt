@@ -1,12 +1,22 @@
-streamlit
-camelot-py[cv]
+# Core dependencies
+streamlit==1.39.0
 pandas
 numpy
-opencv-python-headless
-pdfminer.six
-PyPDF2
 python-dotenv
-langchain==0.3.7
-langchain-groq==0.1.1
-xlsxwriter
+PyPDF2
+pdfminer.six
+opencv-python-headless
 ghostscript
+xlsxwriter
+
+# Camelot for table extraction
+camelot-py[cv]==0.11.0
+
+# LangChain (old compatible version)
+langchain==0.0.353
+langchain-groq==0.1.1
+langchain-community==0.0.19
+langchain-core==0.1.0
+
+# Other dependencies (if needed)
+tiktoken
