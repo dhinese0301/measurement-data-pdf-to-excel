@@ -1,4 +1,4 @@
-# Streamlit and core dependencies
+# === Core dependencies ===
 streamlit==1.39.0
 pandas
 numpy
@@ -9,15 +9,17 @@ opencv-python-headless
 ghostscript
 xlsxwriter
 
-# Camelot for PDF table extraction
+# === Camelot for table extraction ===
 camelot-py[cv]==0.11.0
 
-# LangChain + Groq compatible versions
-langchain==0.1.16
-langchain-community==0.0.34
-langchain-core==0.1.53
-langchain-groq==0.1.1
-langsmith==0.1.17
+# === LangChain ecosystem (based on your local versions) ===
+langchain==0.3.26
+langchain-community==0.3.25
+langchain-core==0.3.66
+langchain-google-genai==2.1.6
+langchain-groq==0.3.2
+langchain-huggingface==0.3.0
+langchain-text-splitters==0.3.8
 
-# Tokenizer
+# === Other dependencies ===
 tiktoken
