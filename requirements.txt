@@ -21,6 +21,5 @@ langchain-groq==0.3.2
 langchain-huggingface==0.3.0
 langchain-text-splitters==0.3.8
 
-
 # === Other dependencies ===
 tiktoken
