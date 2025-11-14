@@ -347,6 +347,7 @@ if uploaded_file is not None and 'df_clean' not in st.session_state:
         )
     )
 
+    
     formatted_prompt_clean = prompt_clean_table.format(context=table_json)
 
     with st.spinner("🧹 Structuring table with Groq..."):
