@@ -205,6 +205,36 @@ st.write(
 
 uploaded_file = st.file_uploader("📄 Upload PDF file", type=["pdf"])
 
+
+def try_all_rotations(pdf_path):
+    rotations = [0, 90, 180, 270]
+    best = None
+    best_count = 0
+
+    for r in rotations:
+        temp = pdf_path.replace(".pdf", f"_{r}.pdf")
+
+        reader = PdfReader(pdf_path)
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            page.rotate_clockwise(r)
+            writer.add_page(page)
+
+        with open(temp, "wb") as f:
+            writer.write(f)
+
+        tables = camelot.read_pdf(temp, pages="all", flavor="lattice")
+        if tables.n > best_count:
+            best = tables
+            best_count = tables.n
+
+    return best
+
+
+def truncate_df_cells(df, max_len=200):
+    return df.applymap(lambda x: str(x)[:max_len] if pd.notna(x) else "")
+
 # Check if a new file was uploaded
 if uploaded_file is not None:
     # If the uploaded file changed, clear the previous df_clean
@@ -227,7 +257,7 @@ if uploaded_file is not None and 'df_clean' not in st.session_state:
         try:
             tables = camelot.read_pdf(file_path, pages="all", flavor="lattice", split_text=True)
             if tables.n == 0:
-                tables = camelot.read_pdf(file_path, pages="all", flavor="stream", split_text=True)
+                tables = camelot.read_pdf(file_path, pages="all", flavor="stream", split_text=True,edge_tol=500)
         except Exception as e:
             st.error(f"❌ Error reading PDF with Camelot: {e}")
             st.stop()
@@ -241,14 +271,25 @@ if uploaded_file is not None and 'df_clean' not in st.session_state:
     # ======================
     # 🔹 Prepare Table Summaries (small for LLM)
     # ======================
+    # table_summaries = []
+    # for i, t in enumerate(tables):
+    #     df_temp = t.df
+    #     sample_rows = df_temp.head(5).values.tolist()  # only first 5 rows to reduce token size
+    #     table_summaries.append({
+    #         "table_index": i + 1,
+    #         "shape": t.shape,
+    #         "header_sample": sample_rows
+    #     })
+    # Prepare minimal table summaries for Groq
     table_summaries = []
     for i, t in enumerate(tables):
-        df_temp = t.df
-        sample_rows = df_temp.head(5).values.tolist()  # only first 5 rows to reduce token size
+        df_temp = t.df.fillna("").astype(str)
+        df_temp = truncate_df_cells(df_temp, max_len=100)  # truncate long cells
         table_summaries.append({
             "table_index": i + 1,
-            "shape": t.shape,
-            "header_sample": sample_rows
+            "num_rows": t.shape[0],
+            "num_columns": t.shape[1],
+            "first_row_sample": df_temp.head(1).values.tolist()
         })
 
     summary_json = json.dumps(table_summaries)
@@ -309,7 +350,7 @@ if uploaded_file is not None and 'df_clean' not in st.session_state:
             "- Optional comment (e.g., 'UPDATE 29/10', 'REV 15/8', 'ADJUSTED 12/07')\n"
             "- Optional Tolerance + (e.g., '1,50')\n"
             "- Optional Tolerance - (e.g., '1,50')\n"
-            "    *Tolerance may also appear as 'Tol+', 'Tol-', 'TOL +', or similar — normalize all to exactly 'Tolerance +' and 'Tolerance -'.*\n"
+            " *Tolerance may also appear as 'Tol+', 'Tol-', 'TOL +', or similar — normalize all to exactly 'Tolerance +' and 'Tolerance -'.*\n"
             "- 'Sizes'(Optional) → key-value pairs where keys are actual size names ('XS', 'S', 'M', 'L', 'XL', etc.) or ('32','34','36','38' etc.) , use like in table\n"
             "- If a size cell has no value, use an empty string \"\".\n\n"
             "2. Output in **pure JSON** (no explanation), structured as a list of objects:\n"
@@ -347,7 +388,7 @@ if uploaded_file is not None and 'df_clean' not in st.session_state:
         )
     )
 
-    
+
     formatted_prompt_clean = prompt_clean_table.format(context=table_json)
 
     with st.spinner("🧹 Structuring table with Groq..."):
